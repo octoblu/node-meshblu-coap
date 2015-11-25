@@ -18,6 +18,7 @@ describe 'MeshbluCoap', ->
     describe '-> register', ->
       beforeEach (done) ->
         response =
+          code: '2.01'
           payload: JSON.stringify uuid: 'new-uuid', type: 'coap-test'
 
         @req.end = =>
@@ -41,6 +42,7 @@ describe 'MeshbluCoap', ->
     describe '-> status', ->
       beforeEach (done) ->
         response =
+          code: '2.00'
           payload: JSON.stringify meshblu: 'online'
 
         @req.end = =>
@@ -67,6 +69,7 @@ describe 'MeshbluCoap', ->
     describe '-> whoami', ->
       beforeEach (done) ->
         response =
+          code: '2.00'
           payload: JSON.stringify uuid: 'a-uuid'
 
         @req.end = =>
@@ -89,6 +92,7 @@ describe 'MeshbluCoap', ->
     describe '-> unregister', ->
       beforeEach (done) ->
         response =
+          code: '2.04'
           payload: JSON.stringify uuid: 'a-uuid'
 
         @req.end = =>

@@ -1,6 +1,6 @@
 {
   "name": "meshblu-coap",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Meshblu CoAP API ",
   "main": "index.js",
   "scripts": {

@@ -55,7 +55,12 @@ class MeshbluCoap
 
   _handleResponse: (req, callback) =>
     req.once 'response', (res) =>
-      callback null, JSON.parse res.payload
+      try
+        payload = JSON.parse res.payload
+      catch e
+        payload = res.payload
+
+      callback null, payload
 
     req.once 'error', (error) =>
       callback error

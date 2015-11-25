@@ -15,22 +15,22 @@ class MeshbluCoap
   register: (device, callback=->) =>
     req = @_requestPost '/devices'
     req.write JSON.stringify device
-    @_handleResponse req, callback
+    @_handleResponse req, '2.01', callback
     req.end()
 
   status: (callback) =>
     req = @_requestGet '/status'
-    @_handleResponse req, callback
+    @_handleResponse req, '2.00', callback
     req.end()
 
   unregister: (uuid, callback=->) =>
     req = @_requestDelete "/devices/#{uuid}"
-    @_handleResponse req, callback
+    @_handleResponse req, '2.04', callback
     req.end()
 
   whoami: (callback) =>
     req = @_requestGet '/whoami'
-    @_handleResponse req, callback
+    @_handleResponse req, '2.00', callback
     req.end()
 
   _request: (options) =>
@@ -53,12 +53,18 @@ class MeshbluCoap
   _requestGet: (pathname) =>
     @_request method: 'GET', pathname: pathname
 
-  _handleResponse: (req, callback) =>
+  _handleResponse: (req, expectedCode, callback) =>
     req.once 'response', (res) =>
+      if res.code != expectedCode
+        return callback new Error "Unexpected code: #{res.code}"
+
       try
         payload = JSON.parse res.payload
       catch e
         payload = res.payload
+
+      if payload?.error?
+        return callback new Error payload.error
 
       callback null, payload
 

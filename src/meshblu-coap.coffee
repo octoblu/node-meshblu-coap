@@ -20,17 +20,17 @@ class MeshbluCoap
 
   status: (callback) =>
     req = @_requestGet '/status'
-    @_handleResponse req, '2.00', callback
+    @_handleResponse req, '2.05', callback
     req.end()
 
   unregister: (uuid, callback=->) =>
     req = @_requestDelete "/devices/#{uuid}"
-    @_handleResponse req, '2.04', callback
+    @_handleResponse req, '2.05', callback
     req.end()
 
   whoami: (callback) =>
     req = @_requestGet '/whoami'
-    @_handleResponse req, '2.00', callback
+    @_handleResponse req, '2.05', callback
     req.end()
 
   _request: (options) =>

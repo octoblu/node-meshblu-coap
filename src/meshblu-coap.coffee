@@ -56,7 +56,9 @@ class MeshbluCoap
   _handleResponse: (req, expectedCode, callback) =>
     req.once 'response', (res) =>
       if res.code != expectedCode
-        return callback new Error "Unexpected code: #{res.code}"
+        error = new Error "Unexpected code: #{res.code}"
+        error.code = res.code
+        return callback error
 
       try
         payload = JSON.parse res.payload

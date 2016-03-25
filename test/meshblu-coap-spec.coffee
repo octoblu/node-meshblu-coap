@@ -48,11 +48,11 @@ describe 'MeshbluCoap', ->
         @req.end = =>
           @req.emit 'response', response
 
-        @sut.status (error, @status) =>
+        @sut.status (error, @response) =>
           done error
 
-      it 'should get a status', ->
-        expect(@status).to.deep.equal meshblu: 'online'
+      it 'should get a response', ->
+        expect(@response).to.deep.equal meshblu: 'online'
 
       it 'should call request', ->
         expect(@request).to.have.been.calledWith
@@ -66,6 +66,146 @@ describe 'MeshbluCoap', ->
     beforeEach ->
       @sut = new MeshbluCoap uuid: 'a-uuid', token: 'a-token', {@request}
 
+    describe '-> device', ->
+      beforeEach (done) ->
+        response =
+          code: '2.05'
+          payload: JSON.stringify uuid: 'a-uuid'
+
+        @req.end = =>
+          @req.emit 'response', response
+
+        @sut.device 'a-uuid', (error, @response) =>
+          done error
+
+      it 'should get a response', ->
+        expect(@response).to.deep.equal uuid: 'a-uuid'
+
+      it 'should call request', ->
+        expect(@request).to.have.been.calledWith
+          hostname: "coap.octoblu.com"
+          method: "GET"
+          options: { 98: new Buffer('a-uuid'), 99: new Buffer('a-token'), 'Content-Type': "application/json" }
+          pathname: "/devices/a-uuid"
+          port: 5683
+
+    describe '-> devicePublicKey', ->
+      beforeEach (done) ->
+        response =
+          code: '2.05'
+          payload: JSON.stringify publicKey: 'a-uuid'
+
+        @req.end = =>
+          @req.emit 'response', response
+
+        @sut.devicePublicKey 'a-uuid', (error, @response) =>
+          done error
+
+      it 'should get a response', ->
+        expect(@response).to.deep.equal publicKey: 'a-uuid'
+
+      it 'should call request', ->
+        expect(@request).to.have.been.calledWith
+          hostname: "coap.octoblu.com"
+          method: "GET"
+          options: { 98: new Buffer('a-uuid'), 99: new Buffer('a-token'), 'Content-Type': "application/json" }
+          pathname: "/devices/a-uuid/publickey"
+          port: 5683
+
+    describe '-> devices', ->
+      beforeEach (done) ->
+        response =
+          code: '2.05'
+          payload: JSON.stringify [uuid: 'a-uuid']
+
+        @req.end = =>
+          @req.emit 'response', response
+
+        @sut.devices foo: 'bar', (error, @response) =>
+          done error
+
+      it 'should get a response', ->
+        expect(@response).to.deep.equal [uuid: 'a-uuid']
+
+      it 'should call request', ->
+        expect(@request).to.have.been.calledWith
+          hostname: "coap.octoblu.com"
+          method: "GET"
+          options: { 98: new Buffer('a-uuid'), 99: new Buffer('a-token'), 'Content-Type': "application/json" }
+          pathname: "/devices?foo=bar"
+          port: 5683
+
+    describe '-> message', ->
+      beforeEach (done) ->
+        response =
+          code: '2.01'
+          payload: JSON.stringify [uuid: 'a-uuid']
+
+        @req.end = =>
+          @req.emit 'response', response
+
+        @sut.message devices: ['*'], foo: 'bar', (error, @response) =>
+          done error
+
+      it 'should get a response', ->
+        expect(@response).to.deep.equal [uuid: 'a-uuid']
+
+      it 'should call request', ->
+        expect(@request).to.have.been.calledWith
+          hostname: "coap.octoblu.com"
+          method: "POST"
+          options: { 98: new Buffer('a-uuid'), 99: new Buffer('a-token'), 'Content-Type': "application/json" }
+          pathname: "/messages"
+          port: 5683
+        expect(@req.write).to.have.been.calledWith JSON.stringify devices: ['*'], foo: 'bar'
+
+    describe '-> mydevices', ->
+      beforeEach (done) ->
+        response =
+          code: '2.05'
+          payload: JSON.stringify [uuid: 'a-uuid']
+
+        @req.end = =>
+          @req.emit 'response', response
+
+        @sut.mydevices (error, @response) =>
+          done error
+
+      it 'should get a response', ->
+        expect(@response).to.deep.equal [uuid: 'a-uuid']
+
+      it 'should call request', ->
+        expect(@request).to.have.been.calledWith
+          hostname: "coap.octoblu.com"
+          method: "GET"
+          options: { 98: new Buffer('a-uuid'), 99: new Buffer('a-token'), 'Content-Type': "application/json" }
+          pathname: "/mydevices"
+          port: 5683
+
+    describe '-> update', ->
+      beforeEach (done) ->
+        response =
+          code: '2.04'
+          payload: JSON.stringify uuid: 'a-uuid'
+
+        @req.end = =>
+          @req.emit 'response', response
+
+        @sut.update 'a-uuid', foo: 'bar', (error, @response) =>
+          done error
+
+      it 'should get a response', ->
+        expect(@response).to.deep.equal uuid: 'a-uuid'
+
+      it 'should call request', ->
+        expect(@request).to.have.been.calledWith
+          hostname: "coap.octoblu.com"
+          method: "PUT"
+          options: { 98: new Buffer('a-uuid'), 99: new Buffer('a-token'), 'Content-Type': "application/json" }
+          pathname: "/devices/a-uuid"
+          port: 5683
+        expect(@req.write).to.have.been.calledWith JSON.stringify foo: 'bar'
+
     describe '-> whoami', ->
       beforeEach (done) ->
         response =
@@ -75,11 +215,11 @@ describe 'MeshbluCoap', ->
         @req.end = =>
           @req.emit 'response', response
 
-        @sut.whoami (error, @status) =>
+        @sut.whoami (error, @response) =>
           done error
 
-      it 'should get a status', ->
-        expect(@status).to.deep.equal uuid: 'a-uuid'
+      it 'should get a response', ->
+        expect(@response).to.deep.equal uuid: 'a-uuid'
 
       it 'should call request', ->
         expect(@request).to.have.been.calledWith
@@ -98,11 +238,11 @@ describe 'MeshbluCoap', ->
         @req.end = =>
           @req.emit 'response', response
 
-        @sut.unregister 'a-uuid', (error, @status) =>
+        @sut.unregister 'a-uuid', (error, @response) =>
           done error
 
-      it 'should get a status', ->
-        expect(@status).to.deep.equal uuid: 'a-uuid'
+      it 'should get a response', ->
+        expect(@response).to.deep.equal uuid: 'a-uuid'
 
       it 'should call request', ->
         expect(@request).to.have.been.calledWith

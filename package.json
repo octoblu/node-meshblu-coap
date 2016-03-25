@@ -1,6 +1,6 @@
 {
   "name": "meshblu-coap",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Meshblu CoAP API ",
   "main": "index.js",
   "scripts": {
@@ -35,6 +35,7 @@
     "coap": "^0.12.1",
     "coffee-script": "^1.10.0",
     "debug": "^2.2.0",
-    "lodash": "^3.10.1"
+    "lodash": "^3.10.1",
+    "qs": "^6.1.0"
   }
 }

@@ -13,6 +13,14 @@ class MeshbluCoap
     catch e
     @server ?= 'meshblu-coap.octoblu.com'
 
+    @baseOptions =
+      hostname: @server
+      port: @port
+      options:
+        'Content-Type': 'application/json'
+        '98': new Buffer @uuid ? ''
+        '99': new Buffer @token ? ''
+
   device: (uuid, callback) =>
     req = @_requestGet "/devices/#{uuid}"
     @_handleResponse req, '2.05', callback
@@ -35,10 +43,9 @@ class MeshbluCoap
     @_handleResponse req, '2.01', callback
     req.end()
 
-  update: (uuid, data, callback) =>
-    req = @_requestPut "/devices/#{uuid}"
-    req.write JSON.stringify data
-    @_handleResponse req, '2.04', callback
+  mydevices: (callback) =>
+    req = @_requestGet '/mydevices'
+    @_handleResponse req, '2.05', callback
     req.end()
 
   register: (device, callback) =>
@@ -52,14 +59,20 @@ class MeshbluCoap
     @_handleResponse req, '2.05', callback
     req.end()
 
+  subscribe: (data, callback) =>
+    queryStr = qs.stringify data
+    req = @_streamRequestGet "/subscribe?#{queryStr}"
+    @_streamResponse req, callback
+
   unregister: (uuid, callback) =>
     req = @_requestDelete "/devices/#{uuid}"
     @_handleResponse req, '2.05', callback
     req.end()
 
-  mydevices: (callback) =>
-    req = @_requestGet '/mydevices'
-    @_handleResponse req, '2.05', callback
+  update: (uuid, data, callback) =>
+    req = @_requestPut "/devices/#{uuid}"
+    req.write JSON.stringify data
+    @_handleResponse req, '2.04', callback
     req.end()
 
   whoami: (callback) =>
@@ -68,27 +81,26 @@ class MeshbluCoap
     req.end()
 
   _request: (options) =>
-    baseOptions =
-      hostname: @server
-      port: @port
-      options:
-        'Content-Type': 'application/json'
-        '98': new Buffer @uuid ? ''
-        '99': new Buffer @token ? ''
-
-    @request _.defaults options, baseOptions
+    @request _.defaults options, @baseOptions
 
   _requestDelete: (pathname) =>
-    @_request method: 'DELETE', pathname: pathname
-
-  _requestPost: (pathname) =>
-    @_request method: 'POST', pathname: pathname
-
-  _requestPut: (pathname) =>
-    @_request method: 'PUT', pathname: pathname
+    @_request {method: 'DELETE', pathname}
 
   _requestGet: (pathname) =>
-    @_request method: 'GET', pathname: pathname
+    @_request {method: 'GET', pathname}
+
+  _requestPost: (pathname) =>
+    @_request {method: 'POST', pathname}
+
+  _requestPut: (pathname) =>
+    @_request {method: 'PUT', pathname}
+
+  _streamRequest: (options) =>
+    options.observe = true
+    @request _.defaults options, @baseOptions
+
+  _streamRequestGet: (pathname) =>
+    @_streamRequest {method: 'GET', pathname}
 
   _handleResponse: (req, expectedCode, callback) =>
     req.once 'response', (res) =>
@@ -105,6 +117,13 @@ class MeshbluCoap
       if payload?.error?
         return callback new Error payload.error
       callback null, payload
+
+    req.once 'error', (error) =>
+      callback error
+
+  _streamResponse: (req, callback) =>
+    req.once 'response', (res) =>
+      callback null, res
 
     req.once 'error', (error) =>
       callback error

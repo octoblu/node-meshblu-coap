@@ -10,6 +10,7 @@ describe 'MeshbluCoap', ->
     @req.write.returns()
     @req.end.returns()
     @request = sinon.stub().returns @req
+    @streamResponse = new EventEmitter2
 
   context 'when unauthenticated', ->
     beforeEach ->
@@ -250,4 +251,34 @@ describe 'MeshbluCoap', ->
           method: "DELETE"
           options: { 98: new Buffer('a-uuid'), 99: new Buffer('a-token'), 'Content-Type': "application/json" }
           pathname: "/devices/a-uuid"
+          port: 5683
+
+    describe '-> subscribe', ->
+      beforeEach (done) ->
+        response =
+          code: '2.05'
+          payload: JSON.stringify uuid: 'a-uuid'
+
+        setTimeout =>
+          @req.emit 'response', @streamResponse
+          setTimeout =>
+            @streamResponse.emit 'data', devices: ['*']
+          , 50
+        , 50
+
+        @sut.subscribe uuid: 'a-uuid', (error, @response) =>
+          return done error if error?
+          @response.on 'data', (@message) =>
+            done()
+
+      it 'should get a message', ->
+        expect(@message).to.deep.equal devices: ['*']
+
+      it 'should call request', ->
+        expect(@request).to.have.been.calledWith
+          hostname: 'meshblu-coap.octoblu.com'
+          method: 'GET'
+          observe: true
+          options: { 98: new Buffer('a-uuid'), 99: new Buffer('a-token'), 'Content-Type': 'application/json' }
+          pathname: '/subscribe?uuid=a-uuid'
           port: 5683

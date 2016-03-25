@@ -11,7 +11,7 @@ class MeshbluCoap
     try
       @port = parseInt @port
     catch e
-    @server ?= 'coap.octoblu.com'
+    @server ?= 'meshblu-coap.octoblu.com'
 
   device: (uuid, callback) =>
     req = @_requestGet "/devices/#{uuid}"

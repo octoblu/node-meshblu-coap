@@ -29,7 +29,7 @@ describe 'MeshbluCoap', ->
 
       it 'should call request', ->
         expect(@request).to.have.been.calledWith
-          hostname: "coap.octoblu.com"
+          hostname: "meshblu-coap.octoblu.com"
           method: "POST"
           options: { 98: new Buffer(''), 99: new Buffer(''), 'Content-Type': "application/json" }
           pathname: "/devices"
@@ -56,7 +56,7 @@ describe 'MeshbluCoap', ->
 
       it 'should call request', ->
         expect(@request).to.have.been.calledWith
-          hostname: "coap.octoblu.com"
+          hostname: "meshblu-coap.octoblu.com"
           method: "GET"
           options: { 98: new Buffer(''), 99: new Buffer(''), 'Content-Type': "application/json" }
           pathname: "/status"
@@ -83,7 +83,7 @@ describe 'MeshbluCoap', ->
 
       it 'should call request', ->
         expect(@request).to.have.been.calledWith
-          hostname: "coap.octoblu.com"
+          hostname: "meshblu-coap.octoblu.com"
           method: "GET"
           options: { 98: new Buffer('a-uuid'), 99: new Buffer('a-token'), 'Content-Type': "application/json" }
           pathname: "/devices/a-uuid"
@@ -106,7 +106,7 @@ describe 'MeshbluCoap', ->
 
       it 'should call request', ->
         expect(@request).to.have.been.calledWith
-          hostname: "coap.octoblu.com"
+          hostname: "meshblu-coap.octoblu.com"
           method: "GET"
           options: { 98: new Buffer('a-uuid'), 99: new Buffer('a-token'), 'Content-Type': "application/json" }
           pathname: "/devices/a-uuid/publickey"
@@ -129,7 +129,7 @@ describe 'MeshbluCoap', ->
 
       it 'should call request', ->
         expect(@request).to.have.been.calledWith
-          hostname: "coap.octoblu.com"
+          hostname: "meshblu-coap.octoblu.com"
           method: "GET"
           options: { 98: new Buffer('a-uuid'), 99: new Buffer('a-token'), 'Content-Type': "application/json" }
           pathname: "/devices?foo=bar"
@@ -152,7 +152,7 @@ describe 'MeshbluCoap', ->
 
       it 'should call request', ->
         expect(@request).to.have.been.calledWith
-          hostname: "coap.octoblu.com"
+          hostname: "meshblu-coap.octoblu.com"
           method: "POST"
           options: { 98: new Buffer('a-uuid'), 99: new Buffer('a-token'), 'Content-Type': "application/json" }
           pathname: "/messages"
@@ -176,7 +176,7 @@ describe 'MeshbluCoap', ->
 
       it 'should call request', ->
         expect(@request).to.have.been.calledWith
-          hostname: "coap.octoblu.com"
+          hostname: "meshblu-coap.octoblu.com"
           method: "GET"
           options: { 98: new Buffer('a-uuid'), 99: new Buffer('a-token'), 'Content-Type': "application/json" }
           pathname: "/mydevices"
@@ -199,7 +199,7 @@ describe 'MeshbluCoap', ->
 
       it 'should call request', ->
         expect(@request).to.have.been.calledWith
-          hostname: "coap.octoblu.com"
+          hostname: "meshblu-coap.octoblu.com"
           method: "PUT"
           options: { 98: new Buffer('a-uuid'), 99: new Buffer('a-token'), 'Content-Type': "application/json" }
           pathname: "/devices/a-uuid"
@@ -223,7 +223,7 @@ describe 'MeshbluCoap', ->
 
       it 'should call request', ->
         expect(@request).to.have.been.calledWith
-          hostname: "coap.octoblu.com"
+          hostname: "meshblu-coap.octoblu.com"
           method: "GET"
           options: { 98: new Buffer('a-uuid'), 99: new Buffer('a-token'), 'Content-Type': "application/json" }
           pathname: "/whoami"
@@ -246,7 +246,7 @@ describe 'MeshbluCoap', ->
 
       it 'should call request', ->
         expect(@request).to.have.been.calledWith
-          hostname: "coap.octoblu.com"
+          hostname: "meshblu-coap.octoblu.com"
           method: "DELETE"
           options: { 98: new Buffer('a-uuid'), 99: new Buffer('a-token'), 'Content-Type': "application/json" }
           pathname: "/devices/a-uuid"

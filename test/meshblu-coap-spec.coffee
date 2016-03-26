@@ -5,9 +5,7 @@ MeshbluCoap = require '../index'
 describe 'MeshbluCoap', ->
   beforeEach ->
     @req = new EventEmitter2
-    @req.write = sinon.stub()
     @req.end = sinon.stub()
-    @req.write.returns()
     @req.end.returns()
     @request = sinon.stub().returns @req
     @streamResponse = new EventEmitter2
@@ -22,7 +20,7 @@ describe 'MeshbluCoap', ->
           code: '2.01'
           payload: JSON.stringify uuid: 'new-uuid', type: 'coap-test'
 
-        @req.end = =>
+        @req.end = sinon.spy =>
           @req.emit 'response', response
 
         @sut.register type: 'coap-test', (error, @device) =>
@@ -35,7 +33,7 @@ describe 'MeshbluCoap', ->
           options: { 98: new Buffer(''), 99: new Buffer(''), 'Content-Type': "application/json" }
           pathname: "/devices"
           port: 5683
-        expect(@req.write).to.have.been.calledWith JSON.stringify type: 'coap-test'
+        expect(@req.end).to.have.been.calledWith JSON.stringify type: 'coap-test'
 
       it 'should get a device', ->
         expect(@device).to.deep.equal uuid: 'new-uuid', type: 'coap-test'
@@ -142,7 +140,7 @@ describe 'MeshbluCoap', ->
           code: '2.01'
           payload: JSON.stringify [uuid: 'a-uuid']
 
-        @req.end = =>
+        @req.end = sinon.spy =>
           @req.emit 'response', response
 
         @sut.message devices: ['*'], foo: 'bar', (error, @response) =>
@@ -158,7 +156,7 @@ describe 'MeshbluCoap', ->
           options: { 98: new Buffer('a-uuid'), 99: new Buffer('a-token'), 'Content-Type': "application/json" }
           pathname: "/messages"
           port: 5683
-        expect(@req.write).to.have.been.calledWith JSON.stringify devices: ['*'], foo: 'bar'
+        expect(@req.end).to.have.been.calledWith JSON.stringify devices: ['*'], foo: 'bar'
 
     describe '-> mydevices', ->
       beforeEach (done) ->
@@ -189,7 +187,7 @@ describe 'MeshbluCoap', ->
           code: '2.04'
           payload: JSON.stringify uuid: 'a-uuid'
 
-        @req.end = =>
+        @req.end = sinon.spy =>
           @req.emit 'response', response
 
         @sut.update 'a-uuid', foo: 'bar', (error, @response) =>
@@ -205,7 +203,7 @@ describe 'MeshbluCoap', ->
           options: { 98: new Buffer('a-uuid'), 99: new Buffer('a-token'), 'Content-Type': "application/json" }
           pathname: "/devices/a-uuid"
           port: 5683
-        expect(@req.write).to.have.been.calledWith JSON.stringify foo: 'bar'
+        expect(@req.end).to.have.been.calledWith JSON.stringify foo: 'bar'
 
     describe '-> whoami', ->
       beforeEach (done) ->
@@ -233,7 +231,7 @@ describe 'MeshbluCoap', ->
     describe '-> unregister', ->
       beforeEach (done) ->
         response =
-          code: '2.05'
+          code: '2.02'
           payload: JSON.stringify uuid: 'a-uuid'
 
         @req.end = =>

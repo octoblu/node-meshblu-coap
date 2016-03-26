@@ -13,14 +13,6 @@ class MeshbluCoap
     catch e
     @server ?= 'meshblu-coap.octoblu.com'
 
-    @baseOptions =
-      hostname: @server
-      port: @port
-      options:
-        'Content-Type': 'application/json'
-        '98': new Buffer @uuid ? ''
-        '99': new Buffer @token ? ''
-
   device: (uuid, callback) =>
     req = @_requestGet "/devices/#{uuid}"
     @_handleResponse req, '2.05', callback
@@ -39,20 +31,18 @@ class MeshbluCoap
 
   message: (message, callback) =>
     req = @_requestPost '/messages'
-    req.write JSON.stringify message
     @_handleResponse req, '2.01', callback
-    req.end()
+    req.end JSON.stringify message
 
   mydevices: (callback) =>
     req = @_requestGet '/mydevices'
     @_handleResponse req, '2.05', callback
     req.end()
 
-  register: (device, callback) =>
+  register: (data, callback) =>
     req = @_requestPost '/devices'
-    req.write JSON.stringify device
     @_handleResponse req, '2.01', callback
-    req.end()
+    req.end JSON.stringify data
 
   status: (callback) =>
     req = @_requestGet '/status'
@@ -66,14 +56,13 @@ class MeshbluCoap
 
   unregister: (uuid, callback) =>
     req = @_requestDelete "/devices/#{uuid}"
-    @_handleResponse req, '2.05', callback
+    @_handleResponse req, '2.02', callback
     req.end()
 
   update: (uuid, data, callback) =>
     req = @_requestPut "/devices/#{uuid}"
-    req.write JSON.stringify data
     @_handleResponse req, '2.04', callback
-    req.end()
+    req.end JSON.stringify data
 
   whoami: (callback) =>
     req = @_requestGet '/whoami'
@@ -81,7 +70,7 @@ class MeshbluCoap
     req.end()
 
   _request: (options) =>
-    @request _.defaults options, @baseOptions
+    @request _.extend {}, options, @_getBaseOptions()
 
   _requestDelete: (pathname) =>
     @_request {method: 'DELETE', pathname}
@@ -97,13 +86,13 @@ class MeshbluCoap
 
   _streamRequest: (options) =>
     options.observe = true
-    @request _.defaults options, @baseOptions
+    @request _.extend {}, options, @_getBaseOptions()
 
   _streamRequestGet: (pathname) =>
     @_streamRequest {method: 'GET', pathname}
 
   _handleResponse: (req, expectedCode, callback) =>
-    req.once 'response', (res) =>
+    req.on 'response', (res) =>
       if res.code != expectedCode
         error = new Error "Unexpected code: #{res.code}"
         error.code = res.code
@@ -120,6 +109,15 @@ class MeshbluCoap
 
     req.once 'error', (error) =>
       callback error
+
+  _getBaseOptions: =>
+    baseOptions =
+      hostname: @server
+      port: @port
+      options:
+        'Content-Type': 'application/json'
+        '98': new Buffer @uuid ? ''
+        '99': new Buffer @token ? ''
 
   _streamResponse: (req, callback) =>
     req.once 'response', (res) =>

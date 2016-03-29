@@ -28,6 +28,7 @@ describe 'MeshbluCoap', ->
 
       it 'should call request', ->
         expect(@request).to.have.been.calledWith
+          agent: false
           hostname: "meshblu-coap.octoblu.com"
           method: "POST"
           options: { 98: new Buffer(''), 99: new Buffer(''), 'Content-Type': "application/json" }
@@ -55,6 +56,7 @@ describe 'MeshbluCoap', ->
 
       it 'should call request', ->
         expect(@request).to.have.been.calledWith
+          agent: false
           hostname: "meshblu-coap.octoblu.com"
           method: "GET"
           options: { 98: new Buffer(''), 99: new Buffer(''), 'Content-Type': "application/json" }
@@ -82,6 +84,7 @@ describe 'MeshbluCoap', ->
 
       it 'should call request', ->
         expect(@request).to.have.been.calledWith
+          agent: false
           hostname: "meshblu-coap.octoblu.com"
           method: "GET"
           options: { 98: new Buffer('a-uuid'), 99: new Buffer('a-token'), 'Content-Type': "application/json" }
@@ -105,6 +108,7 @@ describe 'MeshbluCoap', ->
 
       it 'should call request', ->
         expect(@request).to.have.been.calledWith
+          agent: false
           hostname: "meshblu-coap.octoblu.com"
           method: "GET"
           options: { 98: new Buffer('a-uuid'), 99: new Buffer('a-token'), 'Content-Type': "application/json" }
@@ -128,6 +132,7 @@ describe 'MeshbluCoap', ->
 
       it 'should call request', ->
         expect(@request).to.have.been.calledWith
+          agent: false
           hostname: "meshblu-coap.octoblu.com"
           method: "GET"
           options: { 98: new Buffer('a-uuid'), 99: new Buffer('a-token'), 'Content-Type': "application/json" }
@@ -151,6 +156,7 @@ describe 'MeshbluCoap', ->
 
       it 'should call request', ->
         expect(@request).to.have.been.calledWith
+          agent: false
           hostname: "meshblu-coap.octoblu.com"
           method: "POST"
           options: { 98: new Buffer('a-uuid'), 99: new Buffer('a-token'), 'Content-Type': "application/json" }
@@ -175,6 +181,7 @@ describe 'MeshbluCoap', ->
 
       it 'should call request', ->
         expect(@request).to.have.been.calledWith
+          agent: false
           hostname: "meshblu-coap.octoblu.com"
           method: "GET"
           options: { 98: new Buffer('a-uuid'), 99: new Buffer('a-token'), 'Content-Type': "application/json" }
@@ -198,6 +205,7 @@ describe 'MeshbluCoap', ->
 
       it 'should call request', ->
         expect(@request).to.have.been.calledWith
+          agent: false
           hostname: "meshblu-coap.octoblu.com"
           method: "PUT"
           options: { 98: new Buffer('a-uuid'), 99: new Buffer('a-token'), 'Content-Type': "application/json" }
@@ -222,6 +230,7 @@ describe 'MeshbluCoap', ->
 
       it 'should call request', ->
         expect(@request).to.have.been.calledWith
+          agent: false
           hostname: "meshblu-coap.octoblu.com"
           method: "GET"
           options: { 98: new Buffer('a-uuid'), 99: new Buffer('a-token'), 'Content-Type': "application/json" }
@@ -245,6 +254,7 @@ describe 'MeshbluCoap', ->
 
       it 'should call request', ->
         expect(@request).to.have.been.calledWith
+          agent: false
           hostname: "meshblu-coap.octoblu.com"
           method: "DELETE"
           options: { 98: new Buffer('a-uuid'), 99: new Buffer('a-token'), 'Content-Type': "application/json" }
@@ -260,11 +270,12 @@ describe 'MeshbluCoap', ->
         setTimeout =>
           @req.emit 'response', @streamResponse
           setTimeout =>
+            @streamResponse.emit 'data', subscribed: true
             @streamResponse.emit 'data', devices: ['*']
           , 50
         , 50
 
-        @sut.subscribe uuid: 'a-uuid', (error, @response) =>
+        @sut.subscribe 'a-uuid', {}, (error, @response) =>
           return done error if error?
           @response.on 'data', (@message) =>
             done()
@@ -274,9 +285,10 @@ describe 'MeshbluCoap', ->
 
       it 'should call request', ->
         expect(@request).to.have.been.calledWith
+          agent: false
           hostname: 'meshblu-coap.octoblu.com'
           method: 'GET'
           observe: true
           options: { 98: new Buffer('a-uuid'), 99: new Buffer('a-token'), 'Content-Type': 'application/json' }
-          pathname: '/subscribe?uuid=a-uuid'
+          pathname: '/subscribe/a-uuid?'
           port: 5683

@@ -1,6 +1,7 @@
 _ = require 'lodash'
 coap = require 'coap'
 qs = require 'qs'
+{Readable} = require 'stream'
 
 class MeshbluCoap
   constructor: (options={}, dependencies={}) ->
@@ -49,10 +50,12 @@ class MeshbluCoap
     @_handleResponse req, '2.05', callback
     req.end()
 
-  subscribe: (data, callback) =>
+  subscribe: (uuid, data, callback) =>
     queryStr = qs.stringify data
-    req = @_streamRequestGet "/subscribe?#{queryStr}"
+
+    req = @_streamRequestGet "/subscribe/#{uuid}?#{queryStr}"
     @_streamResponse req, callback
+    req.end()
 
   unregister: (uuid, callback) =>
     req = @_requestDelete "/devices/#{uuid}"
@@ -92,7 +95,9 @@ class MeshbluCoap
     @_streamRequest {method: 'GET', pathname}
 
   _handleResponse: (req, expectedCode, callback) =>
-    req.on 'response', (res) =>
+    unless _.isFunction callback
+      throw new Error 'no callback'
+    req.once 'response', (res) =>
       if res.code != expectedCode
         error = new Error "Unexpected code: #{res.code}"
         error.code = res.code
@@ -105,6 +110,7 @@ class MeshbluCoap
 
       if payload?.error?
         return callback new Error payload.error
+
       callback null, payload
 
     req.once 'error', (error) =>
@@ -112,6 +118,7 @@ class MeshbluCoap
 
   _getBaseOptions: =>
     baseOptions =
+      agent: false
       hostname: @server
       port: @port
       options:
@@ -120,10 +127,9 @@ class MeshbluCoap
         '99': new Buffer @token ? ''
 
   _streamResponse: (req, callback) =>
-    req.once 'response', (res) =>
-      callback null, res
-
-    req.once 'error', (error) =>
-      callback error
+    req.on 'response', (res) =>
+      # eat the first message
+      res.once 'data', (data) =>
+        callback null, res
 
 module.exports = MeshbluCoap
